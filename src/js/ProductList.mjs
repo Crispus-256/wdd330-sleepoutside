@@ -23,6 +23,8 @@ export default class ProductList {
         this.renderList(list);
     }
     renderList(list) {
-        renderListWithTemplate(this.listElement, list, productCardTemplate);
+        const htmlStrings = list.map(productCardTemplate);
+        this.listElement.insertAdjacentHTML("afterbegin", htmlStrings.join(""));
+        //renderListWithTemplate(this.listElement, list, productCardTemplate);
     }
 }
