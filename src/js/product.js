@@ -13,8 +13,3 @@ const product = new ProductDetails(productId, dataSource);
 
 // initialize the page
 product.init();
-
-
-
-
-
