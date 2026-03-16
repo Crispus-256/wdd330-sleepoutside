@@ -8,7 +8,6 @@ const productID = getParam("product");
 const product = new ProductDetails(productID, dataSource);
 product.init();
 
-
 // function addProductToCart(product) {
 //   const cartItems = getLocalStorage("so-cart") || []; // get cart array of items from local storage if null set to empty array
 //   cartItems.push(product);
