@@ -29,3 +29,27 @@ export function renderListWithTemplate(templateFn, parentElement, list, position
   const htmlStrings = list.map(templateFn);
   parentElement.insertAdjacentHTML(position, htmlStrings.join(''));
 }
+  // Render a single template
+  export function renderWithTemplate(template, parentElement, data, callback) {
+    parentElement.innerHTML = template;
+    if (callback) {
+      callback(data);
+    }
+  }
+
+  // Load HTML template from file
+  export async function loadTemplate(path) {
+    const response = await fetch(path);
+    const html = await response.text();
+    return html;
+  }
+
+  // Load header and footer templates and render them
+  export async function loadHeaderFooter() {
+    const headerHtml = await loadTemplate('/src/public/header.html');
+    const footerHtml = await loadTemplate('/src/public/footer.html');
+    const headerElement = document.getElementById('site-header');
+    const footerElement = document.getElementById('site-footer');
+    renderWithTemplate(headerHtml, headerElement);
+    renderWithTemplate(footerHtml, footerElement);
+  }
