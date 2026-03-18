@@ -38,3 +38,4 @@ export default class ProductDetails {
     alert(`${this.product.name} added to cart!`);
   }
 }
+

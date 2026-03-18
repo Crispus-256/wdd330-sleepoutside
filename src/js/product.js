@@ -14,7 +14,10 @@ const product = new ProductDetails(productId, dataSource);
 // initialize the page
 product.init();
 
-
-
-
-
+// listen for Add to Cart click
+document
+  .getElementById("addToCart")
+  .addEventListener("click", () => {
+    product.addToCart();
+    window.location.href = "../cart/index.html";
+  });
