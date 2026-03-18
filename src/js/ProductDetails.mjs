@@ -1,41 +1,52 @@
-// ProductDetails.mjs
-
-import { qs, setLocalStorage, getLocalStorage } from "./utils.mjs";
+import { getLocalStorage, setLocalStorage } from "./utils.mjs";
 
 export default class ProductDetails {
+
   constructor(productId, dataSource) {
     this.productId = productId;
+    this.product = {};
     this.dataSource = dataSource;
-    this.product = {}; // will store product details after fetch
   }
 
   async init() {
-    // fetch product details from dataSource
+    // use the datasource to get the details for the current product. findProductById will return a promise! use await or .then() to process it
     this.product = await this.dataSource.findProductById(this.productId);
+    // the product details are needed before rendering the HTML
     this.renderProductDetails();
-    this.addProductListener();
-  }
-
-  renderProductDetails() {
-    // populate product HTML dynamically
-    qs("#product-title").textContent = this.product.name;
-    qs("#product-price").textContent = `$${this.product.price}`;
-    qs("#product-description").textContent = this.product.description;
-    // You can add images, specs, etc., here
-  }
-
-  addProductListener() {
-    qs("#addToCart").addEventListener(
-      "click",
-      this.addProductToCart.bind(this)
-    );
+    // once the HTML is rendered, add a listener to the Add to Cart button
+    // Notice the .bind(this). This callback will not work if the bind(this) is missing. Review the readings from this week on 'this' to understand why.
+    document
+      .getElementById("addToCart")
+      .addEventListener("click", this.addProductToCart.bind(this));
   }
 
   addProductToCart() {
     const cartItems = getLocalStorage("so-cart") || [];
     cartItems.push(this.product);
     setLocalStorage("so-cart", cartItems);
-    alert(`${this.product.name} added to cart!`);
+  }
+<<<<<<< HEAD
+}
+
+=======
+
+  renderProductDetails() {
+    productDetailsTemplate(this.product);
   }
 }
 
+function productDetailsTemplate(product) {
+  document.querySelector("h2").textContent = product.Brand.Name;
+  document.querySelector("h3").textContent = product.NameWithoutBrand;
+
+  const productImage = document.getElementById("productImage");
+  productImage.src = product.Image;
+  productImage.alt = product.NameWithoutBrand;
+
+  document.getElementById("productPrice").textContent = product.FinalPrice;
+  document.getElementById("productColor").textContent = product.Colors[0].ColorName;
+  document.getElementById("productDesc").innerHTML = product.DescriptionHtmlSimple;
+
+  document.getElementById("addToCart").dataset.id = product.Id;
+}
+>>>>>>> 6397be75110879c67f3be9c34aef1b9f21c10f32
