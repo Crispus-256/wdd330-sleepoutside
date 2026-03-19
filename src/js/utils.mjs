@@ -21,18 +21,3 @@ export function setClick(selector, callback) {
   });
   qs(selector).addEventListener("click", callback);
 }
-
-
-// This function can render ANY list with ANY template anywhere on the site
-export function renderListWithTemplate(templateFn, parentElement, list, position = "afterbegin", clear = false) {
-  // 1. If 'clear' is true, wipe the element clean first
-  if (clear) {
-    parentElement.innerHTML = "";
-  }
-  
-  // 2. Use the 'templateFn' (the machine) to turn objects into HTML
-  const htmlStrings = list.map(templateFn);
-  
-  // 3. Put the finished HTML into the page at the right position
-  parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
-}
