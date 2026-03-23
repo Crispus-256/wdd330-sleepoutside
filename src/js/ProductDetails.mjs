@@ -14,7 +14,7 @@ export default class ProductDetails {
     // the product details are needed before rendering the HTML
     this.renderProductDetails();
     // once the HTML is rendered, add a listener to the Add to Cart button
-    // Notice the .bind(this). This callback will not work if the bind(this) is missing. Review the readings from this week on 'this' to understand why.
+    // Notice the .bind(this). This callback will not work if the bind(this) is missing.
     document
       .getElementById("addToCart")
       .addEventListener("click", this.addProductToCart.bind(this));
@@ -22,7 +22,14 @@ export default class ProductDetails {
 
   addProductToCart() {
     const cartItems = getLocalStorage("so-cart") || [];
-    cartItems.push(this.product);
+
+    const existingItem = cartItems.find((item) => item.Id === this.product.Id);
+    if (existingItem) {
+      existingItem.quantity = (Number(existingItem.quantity) || 1) + 1;
+    } else {
+      cartItems.push({ ...this.product, quantity: 1 });
+    }
+
     setLocalStorage("so-cart", cartItems);
   }
 
@@ -56,11 +63,39 @@ function productDetailsTemplate(product) {
   document.querySelector("h2").textContent = product.Brand.Name;
   document.querySelector("h3").textContent = product.NameWithoutBrand;
 
+  const breadcrumb = document.querySelector("#breadcrumb");
+  if (breadcrumb && product.Category) {
+    const categoryLabel = product.Category
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+    breadcrumb.textContent = categoryLabel;
+  }
+
   const productImage = document.getElementById("productImage");
-  productImage.src = product.Image;
+  const imageSmall = product.Images?.PrimarySmall || product.Image || "";
+  const imageMedium = product.Images?.PrimaryMedium || imageSmall;
+  const imageLarge = product.Images?.PrimaryLarge || imageMedium;
+  const imageXL = product.Images?.PrimaryExtraLarge || imageLarge;
+
+  productImage.src = imageLarge;
+  productImage.srcset = `${imageSmall} 400w, ${imageMedium} 800w, ${imageLarge} 1200w, ${imageXL} 1600w`;
+  productImage.sizes = "(max-width: 600px) 100vw, (max-width: 1080px) 80vw, 500px";
   productImage.alt = product.NameWithoutBrand;
 
   document.getElementById("productPrice").textContent = product.FinalPrice;
+  const discountElement = document.getElementById("productDiscount");
+  const listPrice = Number(product.SuggestedRetailPrice);
+  const salePrice = Number(product.FinalPrice);
+  const discountAmount = listPrice - salePrice;
+
+  if (discountElement && Number.isFinite(discountAmount) && discountAmount > 0) {
+    discountElement.textContent = `Save $${discountAmount.toFixed(2)}`;
+    discountElement.hidden = false;
+  } else if (discountElement) {
+    discountElement.hidden = true;
+  }
+
   document.getElementById("productColor").textContent = product.Colors[0].ColorName;
   document.getElementById("productDesc").innerHTML = product.DescriptionHtmlSimple;
 
