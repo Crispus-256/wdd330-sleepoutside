@@ -4,11 +4,14 @@ function productCardTemplate(product) {
   const isDiscounted = product.FinalPrice < product.SuggestedRetailPrice;
   const discountPercent = isDiscounted ? Math.round(((product.SuggestedRetailPrice - product.FinalPrice) / product.SuggestedRetailPrice) * 100) : 0;
   
+  // Use PrimaryMedium image for list view, fallback to Image if available
+  const imageUrl = product.Images?.PrimaryMedium || product.Image || "";
+  
   return `
     <li class="product-card">
-      <a href="product_pages/?product=${product.Id}">
-        ${isDiscounted ? `<span class="product-card__discount">Save ${discountPercent}%</span>` : ''}
-        <img src="${product.Image}" alt="${product.Name}">
+      <a href="../product_pages/?product=${product.Id}">
+        ${isDiscounted ? `<span class="product-card__discount">Save ${discountPercent}%</span>` : ""}
+        <img src="${imageUrl}" alt="${product.Name}">
         <h2>${product.Brand.Name}</h2>
         <h3>${product.Name}</h3>
         <p class="product-card__price">$${product.FinalPrice}</p>
@@ -25,7 +28,7 @@ export default class ProductList {
   }
 
   async init() {
-    const list = await this.dataSource.getData();
+    const list = await this.dataSource.getData(this.category);
     this.renderList(list);
   }
 
