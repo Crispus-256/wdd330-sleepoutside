@@ -3,22 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sleep Outside | Cart</title>
+    <title>Sleep Outside | Products</title>
 
-    <link rel="stylesheet" href="/css/style.css" />
-
-    <script src="../js/cart.js" type="module"></script>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/product-listing.js" type="module"></script>
   </head>
 
   <body>
     <header class="divider" id="main-header"></header>
+    <nav class="breadcrumb" id="breadcrumb" aria-label="Breadcrumb"></nav>
 
     <main class="divider">
       <section class="products">
-        <h2>My Cart</h2>
-
+        <h2 id="product-title">Top Products</h2>
         <ul class="product-list">
-          <!-- Cart items will be inserted here dynamically by JavaScript -->
+          <!-- Products will be inserted here dynamically -->
         </ul>
       </section>
     </main>

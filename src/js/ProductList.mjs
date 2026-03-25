@@ -1,14 +1,32 @@
-// THE MACHINE (The Template)
 import { renderListWithTemplate } from "./utils.mjs";
+
 function productCardTemplate(product) {
-  return `<li class="product-card">
-    <a href="/product_pages/index.html?product=${product.Id}">
-      <img src="${product.Image}" alt="Image of ${product.Name}">
-      <h3 class="card__brand">${product.Brand.Name}</h3>
-      <h2 class="card__name">${product.NameWithoutBrand}</h2>
-      <p class="product-card__price">$${product.ListPrice}</p>
-    </a>
-  </li>`;
+  const isDiscounted = product.FinalPrice < product.SuggestedRetailPrice;
+  const discountPercent = isDiscounted ? Math.round(((product.SuggestedRetailPrice - product.FinalPrice) / product.SuggestedRetailPrice) * 100) : 0;
+
+  const imageUrl = product.Images?.PrimaryMedium || product.Image || "";
+  const imageSmall = product.Images?.PrimarySmall || imageUrl;
+  const imageMedium = product.Images?.PrimaryMedium || imageUrl;
+  const imageLarge = product.Images?.PrimaryLarge || imageUrl;
+  const imageXL = product.Images?.PrimaryExtraLarge || imageLarge;
+  const srcSet = `${imageSmall} 400w, ${imageMedium} 800w, ${imageLarge} 1200w, ${imageXL} 1600w`;
+  
+  return `
+    <li class="product-card">
+      <a href="../product_pages/?product=${product.Id}">
+        ${isDiscounted ? `<span class="product-card__discount">Save ${discountPercent}%</span>` : ""}
+        <img
+          src="${imageUrl}"
+          srcset="${srcSet}"
+          sizes="(max-width: 500px) 45vw, (max-width: 900px) 30vw, 250px"
+          alt="${product.Name}"
+        >
+        <h2>${product.Brand.Name}</h2>
+        <h3>${product.Name}</h3>
+        <p class="product-card__price">$${product.FinalPrice}</p>
+      </a>
+    </li>
+    `;
 }
 
 export default class ProductList {
@@ -19,24 +37,17 @@ export default class ProductList {
   }
 
   async init() {
-    const list = await this.dataSource.getData();
-    
-    // We only want to show 4 products on the home page (The requirement)
-    const filteredList = this.filterList(list);
-
-    // SEND THE DATA TO BE RENDERED
-    this.renderList(filteredList);
+    const list = await this.dataSource.getData(this.category);
+    this.renderList(list);
   }
-
-  // OPTIONAL: A way to limit or filter products
-  filterList(list) {
-      return list.slice(0, 4); // Only takes the first 4 items
-  }
-// ... inside your ProductList class ...
 
   renderList(list) {
-    // We use our new tool here!
-    // We pass: the card template, the UL element, and our list of tents.
+    // const htmlStrings = list.map(productCardTemplate);
+    // this.listElement.insertAdjacentHTML("afterbegin", htmlStrings.join(""));
+
+    // apply use new utility function instead of the commented code above
     renderListWithTemplate(productCardTemplate, this.listElement, list);
+
   }
+
 }
