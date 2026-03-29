@@ -78,4 +78,18 @@ export default class ExternalServices {
     const response = await fetch(url, options);
     return convertToJson(response);
   }
+
+  async registerUser(payload) {
+    const url = `${baseURL}users`;
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    };
+
+    const response = await fetch(url, options);
+    return convertToJson(response);
+  }
 }

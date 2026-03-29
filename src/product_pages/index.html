@@ -38,9 +38,26 @@
 
         <p id="productDesc" class="product__description">Description</p>
 
-        <div class="product-detail__add">
+        <div class="product-detail__actions">
           <button id="addToCart" data-id="productId">Add to Cart</button>
+          <button id="addToWishlist" type="button">Add to Wishlist</button>
         </div>
+
+        <section class="product-comments" aria-labelledby="product-comments-title">
+          <h4 id="product-comments-title">Customer Comments</h4>
+
+          <form id="productCommentForm" class="product-comments__form">
+            <label for="commentName">Name</label>
+            <input id="commentName" name="name" type="text" minlength="2" required />
+
+            <label for="commentText">Comment</label>
+            <textarea id="commentText" name="comment" rows="4" minlength="3" required></textarea>
+
+            <button type="submit">Post Comment</button>
+          </form>
+
+          <ul id="productComments" class="product-comments__list"></ul>
+        </section>
       </section>
     </main>
 

@@ -13,6 +13,54 @@ export function getLocalStorage(key) {
 export function setLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
+
+export function getCurrentUser() {
+  return getLocalStorage("so-user");
+}
+
+export function getWishlistStorageKey() {
+  const user = getCurrentUser();
+  return user?.email ? `so-wishlist-${user.email}` : "so-wishlist-guest";
+}
+
+export function getWishlistItems() {
+  return getLocalStorage(getWishlistStorageKey()) || [];
+}
+
+export function setWishlistItems(items) {
+  setLocalStorage(getWishlistStorageKey(), items);
+}
+
+export function isInWishlist(productId) {
+  return getWishlistItems().some((item) => item.Id === productId);
+}
+
+export function toggleWishlistItem(product) {
+  const wishlistItems = getWishlistItems();
+  const exists = wishlistItems.some((item) => item.Id === product.Id);
+
+  const updatedItems = exists
+    ? wishlistItems.filter((item) => item.Id !== product.Id)
+    : [...wishlistItems, product];
+
+  setWishlistItems(updatedItems);
+  return { added: !exists, items: updatedItems };
+}
+
+export function addProductToCart(product) {
+  const cartItems = getLocalStorage("so-cart") || [];
+  const existingItem = cartItems.find((item) => item.Id === product.Id);
+
+  if (existingItem) {
+    existingItem.quantity = (Number(existingItem.quantity) || 1) + 1;
+  } else {
+    cartItems.push({ ...product, quantity: 1 });
+  }
+
+  setLocalStorage("so-cart", cartItems);
+  animateCartIcon();
+  return cartItems;
+}
 // set a listener for both touchend and click
 export function setClick(selector, callback) {
   qs(selector).addEventListener("touchend", (event) => {
@@ -61,11 +109,39 @@ export async function loadHeaderFooter() {
 
   if (headerElement) {
     renderWithTemplate(headerTemplate, headerElement);
+    updateCartBadge();
   }
 
   if (footerElement) {
     renderWithTemplate(footerTemplate, footerElement);
   }
+}
+
+function getCartItemCount() {
+  const cartItems = getLocalStorage("so-cart") || [];
+  return cartItems.reduce((total, item) => {
+    const quantity = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
+    return total + quantity;
+  }, 0);
+}
+
+export function updateCartBadge() {
+  const cartLink = document.querySelector(".cart a");
+  if (!cartLink) {
+    return;
+  }
+
+  let badge = cartLink.querySelector(".cart-count");
+  if (!badge) {
+    badge = document.createElement("span");
+    badge.className = "cart-count";
+    badge.setAttribute("aria-live", "polite");
+    cartLink.appendChild(badge);
+  }
+
+  const count = getCartItemCount();
+  badge.textContent = String(count);
+  badge.hidden = count === 0;
 }
 
 export function alertMessage(message, scroll = true) {
@@ -94,4 +170,28 @@ export function alertMessage(message, scroll = true) {
   if (scroll) {
     window.scrollTo(0, 0);
   }
+}
+
+export function animateCartIcon() {
+  const cartContainer = document.querySelector(".cart");
+  const cartIcon = document.querySelector(".cart svg");
+  if (!cartIcon || !cartContainer) {
+    return;
+  }
+
+  updateCartBadge();
+
+  cartIcon.classList.remove("cart-icon--updated");
+  cartContainer.classList.remove("cart--updated");
+  // Force reflow so rapid add-to-cart clicks restart the animation.
+  void cartIcon.offsetWidth;
+  cartIcon.classList.add("cart-icon--updated");
+  cartContainer.classList.add("cart--updated");
+
+  const clearAnimation = () => {
+    cartIcon.classList.remove("cart-icon--updated");
+    cartContainer.classList.remove("cart--updated");
+  };
+
+  cartIcon.addEventListener("animationend", clearAnimation, { once: true });
 }
