@@ -1,4 +1,4 @@
-import ProductData from "./ProductData.mjs";
+import ExternalServices from "./ExternalServices.mjs";
 import ProductList from "./ProductList.mjs";
 import { loadHeaderFooter, getParam } from "./utils.mjs";
 
@@ -8,8 +8,8 @@ const category = getParam("category");
 const searchTerm = getParam("q");
 const breadcrumb = document.querySelector("#breadcrumb");
 
-// Create an instance of the ProductData class
-const dataSource = new ProductData();
+// Create an instance of the ExternalServices class
+const dataSource = new ExternalServices();
 
 // Get the element where the product list will render
 const listElement = document.querySelector(".product-list");

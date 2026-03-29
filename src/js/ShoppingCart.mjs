@@ -47,11 +47,13 @@ export default class ShoppingCart {
 
     if (this.cartItems.length === 0) {
       this.listElement.innerHTML = "<p>Your cart is empty</p>";
+      this.renderCartTotal();
       return;
     }
 
     this.updateCartStorage();
     this.renderCartContents(this.cartItems);
+    this.renderCartTotal();
     this.addQuantityChangeListener();
   }
 
@@ -78,10 +80,29 @@ export default class ShoppingCart {
 
       cartItem.quantity = quantity;
       this.updateCartStorage();
+      this.renderCartTotal();
     });
   }
 
   updateCartStorage() {
     setLocalStorage(this.storageKey, this.cartItems);
+  }
+
+  calculateCartTotal() {
+    return this.cartItems.reduce((total, item) => {
+      const quantity = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
+      const price = Number(item.FinalPrice) || 0;
+      return total + price * quantity;
+    }, 0);
+  }
+
+  renderCartTotal() {
+    const subtotalElement = document.querySelector("#cart-subtotal");
+    if (!subtotalElement) {
+      return;
+    }
+
+    const total = this.calculateCartTotal();
+    subtotalElement.textContent = `$${total.toFixed(2)}`;
   }
 }
