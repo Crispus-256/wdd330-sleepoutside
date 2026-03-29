@@ -1,5 +1,5 @@
 import ExternalServices from "./ExternalServices.mjs";
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import { alertMessage, getLocalStorage, setLocalStorage } from "./utils.mjs";
 
 function formDataToJSON(formElement) {
   const formData = new FormData(formElement);
@@ -82,6 +82,34 @@ export default class CheckoutProcess {
     }
   }
 
+  getErrorMessage(err) {
+    const details = err?.message;
+
+    if (Array.isArray(details)) {
+      return details.join("<br>");
+    }
+
+    if (typeof details === "string") {
+      return details;
+    }
+
+    if (details && typeof details === "object") {
+      if (Array.isArray(details.errors)) {
+        return details.errors.join("<br>");
+      }
+
+      if (typeof details.message === "string") {
+        return details.message;
+      }
+
+      if (Array.isArray(details.message)) {
+        return details.message.join("<br>");
+      }
+    }
+
+    return "There was a problem submitting your order. Please review your information and try again.";
+  }
+
   async checkout(form) {
     const order = formDataToJSON(form);
 
@@ -91,8 +119,14 @@ export default class CheckoutProcess {
     order.shipping = this.shipping;
     order.tax = this.tax.toFixed(2);
 
-    const result = await this.externalServices.checkout(order);
-    setLocalStorage(this.key, []);
-    return result;
+    try {
+      const result = await this.externalServices.checkout(order);
+      setLocalStorage(this.key, []);
+      window.location.assign("/checkout/success.html");
+      return result;
+    } catch (err) {
+      alertMessage(this.getErrorMessage(err));
+      return null;
+    }
   }
 }
