@@ -47,12 +47,14 @@ export default class ShoppingCart {
 
     if (this.cartItems.length === 0) {
       this.listElement.innerHTML = "<p>Your cart is empty</p>";
+      this.updateCartTotal();
       return;
     }
 
     this.updateCartStorage();
     this.renderCartContents(this.cartItems);
     this.addQuantityChangeListener();
+    this.updateCartTotal();
   }
 
   renderCartContents(cartItems) {
@@ -78,7 +80,16 @@ export default class ShoppingCart {
 
       cartItem.quantity = quantity;
       this.updateCartStorage();
+      this.updateCartTotal();
     });
+  }
+
+  updateCartTotal() {
+    const total = this.cartItems.reduce((sum, item) => sum + (item.FinalPrice * (item.quantity || 1)), 0);
+    const totalElem = document.getElementById("cart-total");
+    if (totalElem) {
+      totalElem.innerText = `$${total.toFixed(2)}`;
+    }
   }
 
   updateCartStorage() {
