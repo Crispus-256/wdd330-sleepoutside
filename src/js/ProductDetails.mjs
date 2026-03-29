@@ -1,4 +1,12 @@
-import { getLocalStorage, setLocalStorage } from "./utils.mjs";
+import {
+  addProductToCart,
+  alertMessage,
+  getCurrentUser,
+  getLocalStorage,
+  isInWishlist,
+  setLocalStorage,
+  toggleWishlistItem,
+} from "./utils.mjs";
 
 export default class ProductDetails {
 
@@ -6,6 +14,7 @@ export default class ProductDetails {
     this.productId = productId;
     this.product = {};
     this.dataSource = dataSource;
+    this.commentsStorageKey = "so-product-comments";
   }
 
   async init() {
@@ -18,19 +27,130 @@ export default class ProductDetails {
     document
       .getElementById("addToCart")
       .addEventListener("click", this.addProductToCart.bind(this));
+    document
+      .getElementById("addToWishlist")
+      .addEventListener("click", this.toggleWishlist.bind(this));
+    this.updateWishlistButton();
+    this.initComments();
   }
 
   addProductToCart() {
-    const cartItems = getLocalStorage("so-cart") || [];
+    addProductToCart(this.product);
+    alertMessage(`${this.product.Name} added to cart.`, false);
+  }
 
-    const existingItem = cartItems.find((item) => item.Id === this.product.Id);
-    if (existingItem) {
-      existingItem.quantity = (Number(existingItem.quantity) || 1) + 1;
-    } else {
-      cartItems.push({ ...this.product, quantity: 1 });
+  toggleWishlist() {
+    const result = toggleWishlistItem(this.product);
+    this.updateWishlistButton();
+    alertMessage(
+      result.added
+        ? `${this.product.Name} added to your wishlist.`
+        : `${this.product.Name} removed from your wishlist.`,
+      false
+    );
+  }
+
+  updateWishlistButton() {
+    const wishlistButton = document.getElementById("addToWishlist");
+    if (!wishlistButton || !this.product?.Id) {
+      return;
     }
 
-    setLocalStorage("so-cart", cartItems);
+    const inWishlist = isInWishlist(this.product.Id);
+    wishlistButton.textContent = inWishlist ? "Remove from Wishlist" : "Add to Wishlist";
+    wishlistButton.classList.toggle("wishlist-button--active", inWishlist);
+  }
+
+  initComments() {
+    const commentForm = document.getElementById("productCommentForm");
+    const commentName = document.getElementById("commentName");
+    const currentUser = getCurrentUser();
+
+    if (commentName && currentUser?.name) {
+      commentName.value = currentUser.name;
+    }
+
+    if (commentForm) {
+      commentForm.addEventListener("submit", this.handleCommentSubmit.bind(this));
+    }
+
+    this.renderComments();
+  }
+
+  getCommentsForProduct() {
+    const commentsByProduct = getLocalStorage(this.commentsStorageKey) || {};
+    return commentsByProduct[this.product.Id] || [];
+  }
+
+  saveCommentsForProduct(comments) {
+    const commentsByProduct = getLocalStorage(this.commentsStorageKey) || {};
+    commentsByProduct[this.product.Id] = comments;
+    setLocalStorage(this.commentsStorageKey, commentsByProduct);
+  }
+
+  renderComments() {
+    const commentsList = document.getElementById("productComments");
+    if (!commentsList) {
+      return;
+    }
+
+    const comments = this.getCommentsForProduct();
+    commentsList.innerHTML = "";
+
+    if (!comments.length) {
+      commentsList.innerHTML = "<li class='product-comments__empty'>No comments yet. Be the first to comment.</li>";
+      return;
+    }
+
+    comments.forEach((comment) => {
+      const listItem = document.createElement("li");
+      listItem.className = "product-comments__item";
+
+      const header = document.createElement("p");
+      header.className = "product-comments__meta";
+      const date = comment.date ? new Date(comment.date).toLocaleDateString() : "";
+      header.textContent = `${comment.name}${date ? ` - ${date}` : ""}`;
+
+      const body = document.createElement("p");
+      body.className = "product-comments__text";
+      body.textContent = comment.comment;
+
+      listItem.append(header, body);
+      commentsList.append(listItem);
+    });
+  }
+
+  handleCommentSubmit(event) {
+    event.preventDefault();
+
+    const form = event.target;
+    const isValid = form.checkValidity();
+    form.reportValidity();
+    if (!isValid) {
+      return;
+    }
+
+    const nameInput = form.querySelector("#commentName");
+    const commentInput = form.querySelector("#commentText");
+    const name = nameInput.value.trim();
+    const comment = commentInput.value.trim();
+
+    if (!name || !comment) {
+      return;
+    }
+
+    const comments = this.getCommentsForProduct();
+    comments.unshift({
+      name,
+      comment,
+      date: new Date().toISOString(),
+    });
+
+    this.saveCommentsForProduct(comments);
+    this.renderComments();
+
+    commentInput.value = "";
+    alertMessage("Your comment has been posted.", false);
   }
 
   renderProductDetails() {

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sleep Outside | Create Account</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <script src="../js/register.js" type="module"></script>
+  </head>
+  <body>
+    <header class="divider" id="main-header"></header>
+
+    <main class="divider">
+      <section class="auth-box">
+        <div class="auth-box__intro">
+          <p class="auth-box__eyebrow">Create Your Login</p>
+          <h2>Create Your SleepOutside Account</h2>
+          <p>Use your email as your login and create a password to save your customer profile for future orders.</p>
+        </div>
+
+        <form id="register-form" class="auth-form">
+          <fieldset>
+            <legend>Profile</legend>
+
+            <label for="register-name">Full Name</label>
+            <input id="register-name" name="name" type="text" minlength="2" required />
+
+            <label for="register-email">Email Address</label>
+            <input id="register-email" name="email" type="email" autocomplete="email" required />
+
+            <label for="register-password">Password</label>
+            <input id="register-password" name="password" type="password" minlength="8" autocomplete="new-password" required />
+          </fieldset>
+
+          <fieldset>
+            <legend>Address</legend>
+
+            <label for="register-street">Street Address</label>
+            <input id="register-street" name="street" type="text" minlength="5" required />
+
+            <label for="register-city">City</label>
+            <input id="register-city" name="city" type="text" minlength="2" required />
+
+            <label for="register-state">State</label>
+            <input id="register-state" name="state" type="text" minlength="2" maxlength="2" pattern="[A-Za-z]{2}" title="Use 2-letter state code" required />
+
+            <label for="register-zip">Zip Code</label>
+            <input id="register-zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}(-\d{4})?" title="Use 5 digits or ZIP+4" required />
+          </fieldset>
+
+          <fieldset>
+            <legend>Avatar (Optional)</legend>
+
+            <label for="register-avatar">Upload Avatar</label>
+            <input id="register-avatar" name="avatar" type="file" accept="image/*" />
+            <img id="register-avatar-preview" class="auth-avatar-preview" alt="Avatar preview" hidden />
+          </fieldset>
+
+          <button type="submit">Create Account</button>
+          <p id="register-message" class="auth-message" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer id="main-footer"></footer>
+  </body>
+</html>
