@@ -78,7 +78,7 @@ function productDetailsTemplate(product) {
   const imageLarge = product.Images?.PrimaryLarge || imageMedium;
   const imageXL = product.Images?.PrimaryExtraLarge || imageLarge;
 
-  productImage.src = imageLarge;
+  productImage.src = imageLarge || "/images/banner-sm.jpg";
   productImage.srcset = `${imageSmall} 400w, ${imageMedium} 800w, ${imageLarge} 1200w, ${imageXL} 1600w`;
   productImage.sizes = "(max-width: 600px) 100vw, (max-width: 1080px) 80vw, 500px";
   productImage.alt = product.NameWithoutBrand;
