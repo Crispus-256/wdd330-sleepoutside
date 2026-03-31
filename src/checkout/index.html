@@ -16,8 +16,60 @@
     <header class="divider" id="main-header"></header>
 
     <main class="divider">
-      <section class="products">
+      <section class="products checkout-grid">
         <h2>Review & Place your Order</h2>
+
+        <form id="checkoutForm" class="checkout-form">
+          <fieldset>
+            <legend>Customer Name</legend>
+
+            <label for="fname">First Name</label>
+            <input id="fname" name="fname" type="text" minlength="2" required />
+
+            <label for="lname">Last Name</label>
+            <input id="lname" name="lname" type="text" minlength="2" required />
+          </fieldset>
+
+          <fieldset>
+            <legend>Address</legend>
+
+            <label for="street">Street Address</label>
+            <input id="street" name="street" type="text" minlength="5" required />
+
+            <label for="city">City</label>
+            <input id="city" name="city" type="text" minlength="2" required />
+
+            <label for="state">State</label>
+            <input id="state" name="state" type="text" minlength="2" maxlength="2" pattern="[A-Za-z]{2}" title="Use 2-letter state code" required />
+
+            <label for="zip">Zip Code</label>
+            <input id="zip" name="zip" type="text" inputmode="numeric" pattern="\d{5}(-\d{4})?" title="Use 5 digits or ZIP+4" required />
+          </fieldset>
+
+          <fieldset>
+            <legend>Payment</legend>
+
+            <label for="cardNumber">Credit Card Number</label>
+            <input id="cardNumber" name="cardNumber" type="text" inputmode="numeric" pattern="\d{16}" minlength="16" maxlength="16" title="Enter a 16-digit card number" required />
+
+            <label for="expiration">Expiration Date</label>
+            <input id="expiration" name="expiration" type="text" placeholder="MM/YY" pattern="(0[1-9]|1[0-2])\/\d{2}" title="Use MM/YY format" required />
+
+            <label for="code">Security Code</label>
+            <input id="code" name="code" type="text" inputmode="numeric" pattern="\d{3,4}" title="Use 3 or 4 digits" required />
+          </fieldset>
+
+          <button type="submit">Checkout</button>
+          <p id="checkout-message" aria-live="polite"></p>
+        </form>
+
+        <aside class="checkout-summary" aria-label="Order summary">
+          <h3>Order Summary</h3>
+          <p>Subtotal: <span id="cartTotal">$0.00</span></p>
+          <p>Tax: <span id="tax">$0.00</span></p>
+          <p>Shipping Estimate: <span id="shipping">$0.00</span></p>
+          <p><strong>Order Total: <span id="orderTotal">$0.00</span></strong></p>
+        </aside>
       </section>
     </main>
 

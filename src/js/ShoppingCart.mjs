@@ -1,10 +1,11 @@
-import { getLocalStorage, renderListWithTemplate, setLocalStorage } from "./utils.mjs";
+import { getLocalStorage, renderListWithTemplate, setLocalStorage, updateCartBadge } from "./utils.mjs";
 
 function cartItemTemplate(item) {
   const imageUrl = item.Images?.PrimaryMedium || item.Image || "";
   const quantity = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
 
   return `<li class="cart-card divider">
+  <button class="cart-card__remove" type="button" data-id="${item.Id}" aria-label="Remove ${item.Name} from cart">x</button>
   <a href="#" class="cart-card__image">
     <img
       src="${imageUrl}"
@@ -47,12 +48,16 @@ export default class ShoppingCart {
 
     if (this.cartItems.length === 0) {
       this.listElement.innerHTML = "<p>Your cart is empty</p>";
+      this.renderCartTotal();
+      updateCartBadge();
       return;
     }
 
     this.updateCartStorage();
     this.renderCartContents(this.cartItems);
+    this.renderCartTotal();
     this.addQuantityChangeListener();
+    this.addRemoveItemListener();
   }
 
   renderCartContents(cartItems) {
@@ -78,10 +83,55 @@ export default class ShoppingCart {
 
       cartItem.quantity = quantity;
       this.updateCartStorage();
+      this.renderCartTotal();
+    });
+  }
+
+  addRemoveItemListener() {
+    this.listElement.addEventListener("click", (event) => {
+      const removeButton = event.target.closest(".cart-card__remove");
+      if (!removeButton) {
+        return;
+      }
+
+      const productId = removeButton.dataset.id;
+      if (!productId) {
+        return;
+      }
+
+      this.cartItems = this.cartItems.filter((item) => item.Id !== productId);
+      this.updateCartStorage();
+
+      if (this.cartItems.length === 0) {
+        this.listElement.innerHTML = "<p>Your cart is empty</p>";
+      } else {
+        this.renderCartContents(this.cartItems);
+      }
+
+      this.renderCartTotal();
     });
   }
 
   updateCartStorage() {
     setLocalStorage(this.storageKey, this.cartItems);
+    updateCartBadge();
+  }
+
+  calculateCartTotal() {
+    return this.cartItems.reduce((total, item) => {
+      const quantity = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
+      const price = Number(item.FinalPrice) || 0;
+      return total + price * quantity;
+    }, 0);
+  }
+
+  renderCartTotal() {
+    const subtotalElement = document.querySelector("#cart-subtotal");
+    if (!subtotalElement) {
+      return;
+    }
+
+    const total = this.calculateCartTotal();
+    subtotalElement.textContent = `$${total.toFixed(2)}`;
   }
 }
