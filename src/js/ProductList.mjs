@@ -51,17 +51,15 @@ export default class ProductList {
     // this.listElement.insertAdjacentHTML("afterbegin", htmlStrings.join(""));
 
     // apply use new utility function instead of the commented code above
-    renderListWithTemplate(productCardTemplate, this.listElement, list);
+    renderListWithTemplate(productCardTemplate, this.listElement, list, "afterbegin", true);
     this.addQuickViewListener();
     this.ensureModal();
 
   }
 
   addQuickViewListener() {
-    this.listElement.removeEventListener("click", this.handleQuickViewClick);
-    this.listElement.addEventListener("click", this.handleQuickViewClick);
-  }
-
+  this.listElement.addEventListener("click", this.handleQuickViewClick);
+}
   ensureModal() {
     if (this.modalElement) {
       return;
@@ -72,7 +70,7 @@ export default class ProductList {
     this.modalElement.setAttribute("hidden", "");
     this.modalElement.innerHTML = `
       <div class="quick-view-backdrop"></div>
-      <div class="quick-view-content" role="dialog" aria-modal="true" aria-label="Product quick view">
+      <div class="quick-view-content" role="dialog" aria-modal="true" aria-label="Product quick view" tabindex="-1">
         <button class="quick-view-close" type="button" aria-label="Close quick view">x</button>
         <div class="quick-view-body"></div>
       </div>
