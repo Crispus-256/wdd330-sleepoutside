@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sleep Outside | Home</title>
     <link rel="stylesheet" href="/css/style.css" />
-    <script src="js/main.js" type="module"></script>
-  </head>
-  <body>
+  </head>  <body>
     <header class="divider" id="main-header"></header>
     <main class="divider">
       <div class="hero">
@@ -30,6 +28,11 @@
       <section class="products">
         <h2>Shop by Category</h2>
         <ul class="product-list">
+        <!-- LEAVE THIS TOTALLY EMPTY -->
+    </ul>
+     <!-- <ul class="product-list"></ul> -->
+        <!-- <h2>Top Products</h2> -->
+        <!-- <ul class="product-list">
           <li class="product-card">
             <a href="product_listing/?category=tents">
               <img src="https://byui-cse.github.io/wdd330-ww-course/images/category-tents.svg" alt="Tents" />
@@ -57,7 +60,24 @@
               <h3>Hammocks</h3>
             </a>
           </li>
-        </ul>
+        </ul> -->
+      </section>
+
+      <section class="newsletter-box" aria-labelledby="newsletter-title">
+        <div class="newsletter-box__content">
+          <p class="newsletter-box__eyebrow">Stay Ready</p>
+          <h2 id="newsletter-title">Sign Up for the SleepOutside Newsletter</h2>
+          <p>
+            Get trail-tested gear tips, new product drops, and limited-time deals delivered to your inbox.
+          </p>
+        </div>
+
+        <form id="newsletter-form" class="newsletter-form">
+          <label for="newsletter-email">Email Address</label>
+          <input id="newsletter-email" name="email" type="email" placeholder="you@example.com" required />
+          <button type="submit">Subscribe</button>
+          <p id="newsletter-message" class="newsletter-message" aria-live="polite"></p>
+        </form>
       </section>
 
       <section class="newsletter-box" aria-labelledby="newsletter-title">

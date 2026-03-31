@@ -2,14 +2,12 @@
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);
 }
-// or a more concise version if you are into that sort of thing:
-// export const qs = (selector, parent = document) => parent.querySelector(selector);
 
-// retrieve data from localstorage
+// local storage helpers
 export function getLocalStorage(key) {
   return JSON.parse(localStorage.getItem(key));
 }
-// save data to local storage
+
 export function setLocalStorage(key, data) {
   localStorage.setItem(key, JSON.stringify(data));
 }
@@ -61,6 +59,7 @@ export function addProductToCart(product) {
   animateCartIcon();
   return cartItems;
 }
+
 // set a listener for both touchend and click
 export function setClick(selector, callback) {
   qs(selector).addEventListener("touchend", (event) => {
@@ -70,34 +69,34 @@ export function setClick(selector, callback) {
   qs(selector).addEventListener("click", callback);
 }
 
-// get the product id from the query string
 export function getParam(param) {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-  const product = urlParams.get(param);
-  return product
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(param);
 }
 
-export function renderListWithTemplate(template, parentElement, list, position = "afterbegin", clear = false) {
-  const htmlStrings = list.map(template);
-  // if clear is true we need to clear out the contents of the parent.
+export function renderListWithTemplate(
+  template,
+  parentElement,
+  list,
+  position = "afterbegin",
+  clear = false
+) {
   if (clear) {
     parentElement.innerHTML = "";
   }
+
+  const htmlStrings = list.map(template);
   parentElement.insertAdjacentHTML(position, htmlStrings.join(""));
 }
 
 export function renderWithTemplate(template, parentElement, data, callback) {
   parentElement.innerHTML = template;
-  if (callback) {
-    callback(data);
-  }
+  if (callback) callback(data);
 }
 
 export async function loadTemplate(path) {
   const res = await fetch(path);
-  const template = await res.text();
-  return template;
+  return await res.text();
 }
 
 export async function loadHeaderFooter() {
@@ -117,6 +116,13 @@ export async function loadHeaderFooter() {
   }
 }
 
+/* ===== CART BADGE SYSTEM ===== */
+
+function getCartItemCount() {
+  const cartItems = getLocalStorage("so-cart") || [];
+  return cartItems.reduce((total, item) => {
+    const qty = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
+    return total + qty;
 function getCartItemCount() {
   const cartItems = getLocalStorage("so-cart") || [];
   return cartItems.reduce((total, item) => {
@@ -127,6 +133,10 @@ function getCartItemCount() {
 
 export function updateCartBadge() {
   const cartLink = document.querySelector(".cart a");
+  if (!cartLink) return;
+
+  let badge = cartLink.querySelector(".cart-count");
+
   if (!cartLink) {
     return;
   }
@@ -144,6 +154,11 @@ export function updateCartBadge() {
   badge.hidden = count === 0;
 }
 
+export function animateCartIcon() {
+  const cartContainer = document.querySelector(".cart");
+  const cartIcon = document.querySelector(".cart svg");
+
+  if (!cartContainer || !cartIcon) return;
 export function alertMessage(message, scroll = true) {
   const main = document.querySelector("main");
   if (!main) {
@@ -183,6 +198,21 @@ export function animateCartIcon() {
 
   cartIcon.classList.remove("cart-icon--updated");
   cartContainer.classList.remove("cart--updated");
+
+  void cartIcon.offsetWidth;
+
+  cartIcon.classList.add("cart-icon--updated");
+  cartContainer.classList.add("cart--updated");
+
+  cartIcon.addEventListener(
+    "animationend",
+    () => {
+      cartIcon.classList.remove("cart-icon--updated");
+      cartContainer.classList.remove("cart--updated");
+    },
+    { once: true }
+  );
+}
   // Force reflow so rapid add-to-cart clicks restart the animation.
   void cartIcon.offsetWidth;
   cartIcon.classList.add("cart-icon--updated");
