@@ -60,6 +60,7 @@ export function addProductToCart(product) {
   return cartItems;
 }
 
+// set a listener for both touchend and click
 export function setClick(selector, callback) {
   qs(selector).addEventListener("touchend", (event) => {
     event.preventDefault();
@@ -122,6 +123,11 @@ function getCartItemCount() {
   return cartItems.reduce((total, item) => {
     const qty = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
     return total + qty;
+function getCartItemCount() {
+  const cartItems = getLocalStorage("so-cart") || [];
+  return cartItems.reduce((total, item) => {
+    const quantity = Number(item.quantity) > 0 ? Number(item.quantity) : 1;
+    return total + quantity;
   }, 0);
 }
 
@@ -131,6 +137,11 @@ export function updateCartBadge() {
 
   let badge = cartLink.querySelector(".cart-count");
 
+  if (!cartLink) {
+    return;
+  }
+
+  let badge = cartLink.querySelector(".cart-count");
   if (!badge) {
     badge = document.createElement("span");
     badge.className = "cart-count";
@@ -148,6 +159,40 @@ export function animateCartIcon() {
   const cartIcon = document.querySelector(".cart svg");
 
   if (!cartContainer || !cartIcon) return;
+export function alertMessage(message, scroll = true) {
+  const main = document.querySelector("main");
+  if (!main) {
+    return;
+  }
+
+  const existing = main.querySelector(".alert");
+  if (existing) {
+    existing.remove();
+  }
+
+  const alert = document.createElement("div");
+  alert.classList.add("alert");
+  alert.innerHTML = `<p>${message}</p><button type="button" aria-label="Close alert">x</button>`;
+
+  alert.addEventListener("click", (event) => {
+    if (event.target.tagName === "BUTTON") {
+      alert.remove();
+    }
+  });
+
+  main.prepend(alert);
+
+  if (scroll) {
+    window.scrollTo(0, 0);
+  }
+}
+
+export function animateCartIcon() {
+  const cartContainer = document.querySelector(".cart");
+  const cartIcon = document.querySelector(".cart svg");
+  if (!cartIcon || !cartContainer) {
+    return;
+  }
 
   updateCartBadge();
 
@@ -167,4 +212,16 @@ export function animateCartIcon() {
     },
     { once: true }
   );
+}
+  // Force reflow so rapid add-to-cart clicks restart the animation.
+  void cartIcon.offsetWidth;
+  cartIcon.classList.add("cart-icon--updated");
+  cartContainer.classList.add("cart--updated");
+
+  const clearAnimation = () => {
+    cartIcon.classList.remove("cart-icon--updated");
+    cartContainer.classList.remove("cart--updated");
+  };
+
+  cartIcon.addEventListener("animationend", clearAnimation, { once: true });
 }

@@ -52,6 +52,7 @@ export default class ProductList {
 
     // apply use new utility function instead of the commented code above
     renderListWithTemplate(productCardTemplate, this.listElement, list, "afterbegin", true);
+    renderListWithTemplate(productCardTemplate, this.listElement, list);
     this.addQuickViewListener();
     this.ensureModal();
 
@@ -60,6 +61,10 @@ export default class ProductList {
   addQuickViewListener() {
   this.listElement.addEventListener("click", this.handleQuickViewClick);
 }
+    this.listElement.removeEventListener("click", this.handleQuickViewClick);
+    this.listElement.addEventListener("click", this.handleQuickViewClick);
+  }
+
   ensureModal() {
     if (this.modalElement) {
       return;
@@ -71,6 +76,7 @@ export default class ProductList {
     this.modalElement.innerHTML = `
       <div class="quick-view-backdrop"></div>
       <div class="quick-view-content" role="dialog" aria-modal="true" aria-label="Product quick view" tabindex="-1">
+      <div class="quick-view-content" role="dialog" aria-modal="true" aria-label="Product quick view">
         <button class="quick-view-close" type="button" aria-label="Close quick view">x</button>
         <div class="quick-view-body"></div>
       </div>
